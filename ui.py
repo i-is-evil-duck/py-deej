@@ -38,11 +38,7 @@ def start(port=5000):
         _create_default_html()
 
     eel.init(HTML_FOLDER)
-    options = {
-        'port': port,
-        'server': 'gevent',
-    }
-    eel.start("index.html", **options)
+    eel.start("index.html", port=port)
 
 
 def _create_default_html():

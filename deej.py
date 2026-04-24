@@ -19,6 +19,14 @@ try:
 except ImportError:
     WINDOWS = False
 
+
+def _init_com():
+    if WINDOWS:
+        try:
+            comtypes.CoInitialize()
+        except Exception:
+            pass
+
 # ---------------- Linux ----------------
 try:
     import pulsectl
@@ -44,6 +52,12 @@ class VolumeController:
                 self.pulse = pulsectl.Pulse("deej")
             except:
                 self.pulse = None
+
+        if WINDOWS:
+            try:
+                comtypes.CoInitialize()
+            except Exception:
+                pass
 
     # ---------------- Windows ----------------
     def refresh_windows(self):

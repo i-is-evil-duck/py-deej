@@ -22,7 +22,7 @@ def _run_volume_control(config_path, debug):
 
 
 def _open_ui_from_tray():
-    ui.start()
+    threading.Thread(target=ui.start, daemon=True).start()
 
 
 def _quit_from_tray():
@@ -37,18 +37,22 @@ def main():
     global _volume_thread, _running
     
     parser = argparse.ArgumentParser()
-    parser.add_argument("--debug", action="store_true", help="Enable debug mode")
+    parser.add_argument("--debug", action="store_true", help="Debug volume control")
+    parser.add_argument("--debug-ui", action="store_true", help="Debug UI")
+    parser.add_argument("-s", "--serial", default="COM3", help="COM port")
+    parser.add_argument("-t", "--tray", action="store_true", help="Enable system tray (default: enabled)")
+    parser.add_argument("--no-tray", action="store_true", help="Disable system tray")
     parser.add_argument("--config", default="config.yaml", help="Path to config file")
     parser.add_argument("--port", default=5000, type=int, help="UI server port")
-    parser.add_argument("--no-tray", action="store_true", help="Disable system tray icon")
     args = parser.parse_args()
 
     # Start volume control in background thread
     _volume_thread = threading.Thread(target=_run_volume_control, args=(args.config, args.debug), daemon=True)
     _volume_thread.start()
     
-    # Start tray icon
-    if not args.no_tray:
+    # Start tray icon unless --no-tray or -t is used
+    use_tray = not args.no_tray or args.tray
+    if use_tray:
         tray.start(on_open_ui=_open_ui_from_tray, on_quit=_quit_from_tray)
     
     # Wait forever (tray runs in background)

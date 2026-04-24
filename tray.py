@@ -28,13 +28,19 @@ def _create_icon_image():
 
 
 def _open_handler(icon, item):
-    if _on_open_ui:
-        _on_open_ui()
+    try:
+        if _on_open_ui:
+            _on_open_ui()
+    except Exception:
+        pass
 
 
 def _quit_handler(icon, item):
-    if _on_quit:
-        _on_quit()
+    try:
+        if _on_quit:
+            _on_quit()
+    except Exception:
+        pass
 
 
 def start(on_open_ui=None, on_quit=None):
