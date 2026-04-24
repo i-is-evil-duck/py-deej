@@ -146,11 +146,13 @@ class NoiseReducer:
 # Serial Reader
 # =========================================================
 class SerialReader:
-    def __init__(self, port, baud, sliders, debug=False, jitter_threshold=10):
+    def __init__(self, port, baud, sliders, debug=False, jitter_threshold=10, reconnect=True):
         self.port = port
         self.baud = baud
         self.sliders = sliders
         self.debug = debug
+        self.reconnect = reconnect
+        self.reconnect_delay = 2
 
         self.serial = None
         self.running = False
@@ -160,10 +162,14 @@ class SerialReader:
 
     def connect(self):
         try:
+            if self.serial and self.serial.is_open:
+                return True
             self.serial = serial.Serial(self.port, self.baud, timeout=1)
+            logger.info(f"Connected to {self.port}")
             return True
         except Exception as e:
-            print("Serial error:", e)
+            if self.debug:
+                logger.error(f"Serial connect error: {e}")
             return False
 
     def parse(self, line):
@@ -175,6 +181,15 @@ class SerialReader:
 
     def loop(self):
         while self.running:
+            if not self.serial or not self.serial.is_open:
+                if self.reconnect:
+                    logger.info(f"Serial disconnected, reconnecting in {self.reconnect_delay}s...")
+                    time.sleep(self.reconnect_delay)
+                    if not self.connect():
+                        continue
+                else:
+                    break
+
             try:
                 if self.serial.in_waiting:
                     line = self.serial.readline().decode(errors="ignore")
@@ -190,12 +205,22 @@ class SerialReader:
 
                 time.sleep(0.002)
 
+            except serial.SerialException as e:
+                logger.error(f"Serial error: {e}")
+                if self.serial:
+                    try:
+                        self.serial.close()
+                    except:
+                        pass
+                self.serial = None
+
             except Exception as e:
-                print("Loop error:", e)
+                logger.error(f"Loop error: {e}")
 
     def start(self):
         if not self.connect():
-            return False
+            if not self.reconnect:
+                return False
 
         self.running = True
         threading.Thread(target=self.loop, daemon=True).start()
@@ -229,13 +254,19 @@ class DeejApp:
         port = cfg.get("com_port", "COM3")
         baud = cfg.get("baud_rate", 9600)
         jitter = cfg.get("jitter_threshold", 10)
+        invert = cfg.get("invert_sliders", False)
+        reconnect = cfg.get("reconnect", True)
 
         sliders = max(map(int, mapping.keys())) + 1
 
-        self.reader = SerialReader(port, baud, sliders, self.debug, jitter_threshold=jitter)
+        self.reader = SerialReader(port, baud, sliders, self.debug, jitter_threshold=jitter, reconnect=reconnect)
         self.last_percent = {}
+        self.invert = invert
 
         def handle(values):
+            if self.invert:
+                values = [1023 - v for v in values]
+
             for i, v in enumerate(values):
                 key = str(i)
 

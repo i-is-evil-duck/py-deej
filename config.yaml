@@ -9,5 +9,6 @@ slider_mapping:
 
 jitter_threshold: 10
 invert_sliders: false
+reconnect: true
 com_port: COM3
 baud_rate: 9600
