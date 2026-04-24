@@ -39,7 +39,6 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--debug", action="store_true", help="Debug volume control")
     parser.add_argument("--debug-ui", action="store_true", help="Debug UI")
-    parser.add_argument("-s", "--serial", default="COM3", help="COM port")
     parser.add_argument("-t", "--tray", action="store_true", help="Enable system tray (default: enabled)")
     parser.add_argument("--no-tray", action="store_true", help="Disable system tray")
     parser.add_argument("--config", default="config.yaml", help="Path to config file")

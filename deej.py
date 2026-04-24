@@ -251,12 +251,19 @@ class SerialReader:
 # App
 # =========================================================
 class DeejApp:
+    _instance = None
+    
     def __init__(self, config, debug=False):
         self.config = Path(config)
         self.debug = debug
         self.volume = VolumeController()
         self.reader = None
+        DeejApp._instance = self
 
+    @classmethod
+    def get_instance(cls):
+        return cls._instance
+    
     def load(self):
         with open(self.config) as f:
             return yaml.safe_load(f)
@@ -276,6 +283,7 @@ class DeejApp:
         self.reader = SerialReader(port, baud, sliders, self.debug, jitter_threshold=jitter, reconnect=reconnect)
         self.last_percent = {}
         self.invert = invert
+        self.current_volumes = {}
 
         def handle(values):
             if self.invert:
@@ -289,6 +297,7 @@ class DeejApp:
 
                 percent = int((v / 1023) * 100)
                 apps = mapping[key]
+                self.current_volumes[key] = {"percent": percent, "apps": apps}
 
                 if key not in self.last_percent or self.last_percent[key] != percent:
                     self.last_percent[key] = percent

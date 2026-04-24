@@ -1,0 +1,6 @@
+master
+brave.exe
+spotify.exe
+assetocorsa.exe
+discord.exe
+msedgewebview2.exe
