@@ -132,6 +132,25 @@ class VolumeController:
 
         return sorted(apps)
 
+    def get_volume(self, app):
+        app = app.lower()
+        
+        if WINDOWS:
+            self.refresh_windows()
+            for name, s in self.sessions.items():
+                if app in name:
+                    vol = s._ctl.QueryInterface(ISimpleAudioVolume)
+                    return int(vol.GetMasterVolume() * 100)
+        
+        elif LINUX and self.pulse:
+            for sink in self.pulse.sink_input_list():
+                props = getattr(sink, "proplist", {})
+                name = props.get("application.process.binary", "").lower()
+                if app in name:
+                    return int(sink.volume.values()[0] * 100)
+        
+        return None
+
 
 # =========================================================
 # Noise filter

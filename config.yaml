@@ -1,14 +1,16 @@
-slider_mapping:
-  "0": master
-  "1": brave.exe
-  "2": spotify.exe
-  "3":
-    - assetocorsa.exe
-    - discord.exe
-  "4": master
-
-jitter_threshold: 10
-invert_sliders: false
-reconnect: true
-com_port: COM3
 baud_rate: 9600
+com_port: COM3
+invert_sliders: false
+jitter_threshold: 10
+reconnect: true
+slider_mapping:
+  '0':
+  - master
+  '1':
+  - brave.exe
+  '2':
+  - spotify.exe
+  '3':
+  - discord.exe
+  '4':
+  - assetocorsa.exe

@@ -7,85 +7,396 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
               background: #1a1a2e; color: #eee; padding: 20px; }
-        h1 { margin-bottom: 20px; color: #eee; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .section { background: #16213e; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        h1 { margin-bottom: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; }
+        .tab { background: #16213e; color: #888; border: none; padding: 12px 24px; border-radius: 8px 8px 0 0; 
+               cursor: pointer; font-size: 16px; transition: all 0.2s; }
+        .tab:hover { background: #1f2f50; }
+        .tab.active { background: #16213e; color: #ff6b6b; border-bottom: 3px solid #ff6b6b; }
+        
+        .tab-content { display: none; background: #16213e; padding: 20px; border-radius: 0 8px 8px 8px; }
+        .tab-content.active { display: block; }
+        
+        .section { background: #0f3460; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
         .section h2 { margin-bottom: 15px; color: #ff6b6b; }
         label { display: block; margin-bottom: 5px; }
         input[type="text"], input[type="number"], select { width: 100%; padding: 10px; margin-bottom: 15px; border: none; border-radius: 4px; 
-                       background: #0f3460; color: #eee; }
+                       background: #1a1a2e; color: #eee; }
         input[type="checkbox"] { width: auto; margin-right: 10px; }
         button { background: #e94560; color: white; border: none; padding: 12px 24px; border-radius: 4px; 
                  cursor: pointer; font-size: 16px; margin-right: 10px; }
         button:hover { background: #ff6b6b; }
-        button.secondary { background: #0f3460; }
-        .slider-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
-        .slider-row input[type="number"], .slider-row input[type="text"] { margin-bottom: 0; }
-        .remove-btn { background: #e94560; padding: 10px; width: auto; }
-    </style>
-</head>
-    <meta charset="UTF-8">
-    <title>Deej Config Editor</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-              background: #1a1a2e; color: #eee; padding: 20px; }
-        h1 { margin-bottom: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .section { background: #16213e; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        .section h2 { margin-bottom: 15px; color: #0f3460; }
-        label { display: block; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 10px; margin-bottom: 15px; border: none; border-radius: 4px; 
-                       background: #0f3460; color: #eee; }
-        button { background: #e94560; color: white; border: none; padding: 12px 24px; border-radius: 4px; 
-                 cursor: pointer; font-size: 16px; margin-right: 10px; }
-        button:hover { background: #ff6b6b; }
-        button.secondary { background: #0f3460; }
+        button.secondary { background: #16213e; }
+        
         .slider-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
         .slider-row input { margin-bottom: 0; }
-        .remove-btn { background: #e94560; padding: 10px; }
+        .remove-btn { background: #e94560; padding: 10px; width: auto; }
+        
+        .app-list { max-height: 400px; overflow-y: auto; }
+        .app-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; 
+                    background: #1a1a2e; border-radius: 4px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
+        .app-item:hover { background: #252540; }
+        .app-item.active { border-left: 4px solid #4ade80; }
+        .app-item.active .app-name { color: #4ade80; }
+        .app-name { font-weight: 500; }
+        .app-status { font-size: 12px; color: #666; }
+        
+        .overview-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .stat-card { background: #0f3460; padding: 20px; border-radius: 8px; text-align: center; }
+        .stat-card .value { font-size: 32px; font-weight: bold; color: #ff6b6b; }
+        .stat-card .label { color: #888; margin-top: 5px; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+                 background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: #16213e; padding: 25px; border-radius: 12px; min-width: 400px; max-width: 500px; }
+        .modal-content h3 { margin-bottom: 20px; color: #ff6b6b; }
+        .slider-select-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+        .slider-btn { padding: 15px; background: #0f3460; border: 2px solid transparent; border-radius: 8px; 
+                      cursor: pointer; text-align: center; font-size: 18px; color: #eee; transition: all 0.2s; }
+        .slider-btn:hover { background: #1a3a6e; }
+        .slider-btn.selected { border-color: #4ade80; background: #1a3a6e; color: #4ade80; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        
+        .info-text { color: #888; line-height: 1.6; margin-bottom: 15px; }
+        .feature-list { list-style: none; padding: 0; }
+        .feature-list li { padding: 8px 0; border-bottom: 1px solid #1f2f50; }
+        .feature-list li:last-child { border-bottom: none; }
+        .feature-list li::before { content: "✓"; color: #4ade80; margin-right: 10px; }
+        
+        .status-indicator { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; }
+        .status-indicator.active { background: #4ade80; }
+        .status-indicator.inactive { background: #666; }
+        
+        .slider-volume { margin-bottom: 15px; }
+        .slider-volume-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .slider-volume-header span { font-weight: 500; }
+        .volume-bar { height: 12px; background: #1a1a2e; border-radius: 6px; overflow: hidden; }
+        .volume-fill { height: 100%; background: linear-gradient(90deg, #4ade80, #22c55e); border-radius: 6px; transition: width 0.3s; }
+        .slider-apps { font-size: 12px; color: #888; margin-top: 5px; }
+        
+        .connected-badge { background: #4ade80; color: #1a1a2e; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .disconnected-badge { background: #e94560; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Deej Config Editor</h1>
         
-        <div class="section">
-            <h2>Serial Settings</h2>
-            <label>COM Port</label>
-            <select id="com_port"></select>
-            <label>Baud Rate</label>
-            <input type="number" id="baud_rate" value="9600">
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('home')">Home</button>
+            <button class="tab" onclick="showTab('sliders')">Slider Settings</button>
+            <button class="tab" onclick="showTab('apps')">App Configuration</button>
         </div>
         
-        <div class="section">
-            <h2>Slider Mapping</h2>
-            <div id="mappings"></div>
-            <button onclick="addMapping()">Add Slider</button>
+        <div id="home" class="tab-content active">
+            <div class="section">
+                <h2>Overview</h2>
+                <div class="overview-stats">
+                    <div class="stat-card">
+                        <div class="value" id="slider-count">0</div>
+                        <div class="label">Sliders Configured</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" id="app-count">0</div>
+                        <div class="label">Apps Bound</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" id="active-count">0</div>
+                        <div class="label">Active Apps</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" id="port-display">-</div>
+                        <div class="label">COM Port</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Slider Volumes</h2>
+                <div id="slider-volumes"></div>
+            </div>
+            
+            <div class="section">
+                <h2>Quick Status</h2>
+                <p><span class="status-indicator" id="connection-status"></span><span id="connection-text">Checking connection...</span></p>
+                <p style="margin-top: 10px;"><strong>Baud Rate:</strong> <span id="baud-display">9600</span></p>
+            </div>
         </div>
         
-        <div class="section">
-            <h2>Options</h2>
-            <label>Jitter Threshold</label>
-            <input type="number" id="jitter_threshold" value="10">
-            <label>
-                <input type="checkbox" id="invert_sliders"> Invert Sliders
-            </label>
-            <label>
-                <input type="checkbox" id="reconnect" checked> Auto Reconnect
-            </label>
+        <div id="sliders" class="tab-content">
+            <div class="section">
+                <h2>Slider Mapping</h2>
+                <p class="info-text">Configure which apps are controlled by each slider. Click "Add Slider" to create a new mapping.</p>
+                <div id="mappings"></div>
+                <button onclick="addMapping()">Add Slider</button>
+            </div>
+            
+            <div class="section">
+                <h2>Serial Settings</h2>
+                <label>COM Port</label>
+                <select id="com_port"></select>
+                <label>Baud Rate</label>
+                <input type="number" id="baud_rate" value="9600">
+            </div>
+            
+            <div class="section">
+                <h2>Options</h2>
+                <label>Jitter Threshold</label>
+                <input type="number" id="jitter_threshold" value="10">
+                <label>
+                    <input type="checkbox" id="invert_sliders"> Invert Sliders
+                </label>
+                <label>
+                    <input type="checkbox" id="reconnect" checked> Auto Reconnect
+                </label>
+            </div>
+            
+            <button onclick="save()">Save Config</button>
+            <button class="secondary" onclick="load()">Reload</button>
         </div>
         
-        <button onclick="save()">Save Config</button>
-        <button class="secondary" onclick="load()">Reload</button>
+        <div id="apps" class="tab-content">
+            <div class="section">
+                <h2>Application Configuration</h2>
+                <p class="info-text">View all active applications and bind them to sliders. Click on any app to configure which slider controls its volume.</p>
+                <div class="app-list" id="app-list"></div>
+                <button onclick="refreshApps()" style="margin-top: 15px;">Refresh App List</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="slider-modal">
+        <div class="modal-content">
+            <h3>Bind App to Slider</h3>
+            <p style="margin-bottom: 15px; color: #888;">Select a slider to control <strong id="selected-app-name"></strong></p>
+            <div class="slider-select-grid" id="slider-grid"></div>
+            <div class="modal-actions">
+                <button class="secondary" onclick="closeModal()">Cancel</button>
+                <button onclick="saveAppBinding()">Save</button>
+            </div>
+        </div>
     </div>
 
     <script src="/eel.js"></script>
     <script>
         let config = {};
+        let activeApps = [];
+        let selectedApp = null;
+        
+        function showTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            document.querySelector(`.tab[onclick="showTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            
+            if (tabId === 'home') loadOverview();
+            if (tabId === 'apps') refreshApps();
+        }
+        
+        async function init() {
+            await load();
+            await loadOverview();
+        }
+        
+        async function loadOverview() {
+            config = await eel.load_config()();
+            activeApps = await eel.get_active_apps()();
+            
+            const mapping = config.slider_mapping || {};
+            const sliderCount = Object.keys(mapping).length;
+            const boundApps = new Set();
+            for (const apps of Object.values(mapping)) {
+                if (Array.isArray(apps)) {
+                    apps.forEach(a => boundApps.add(a.toLowerCase()));
+                } else if (apps) {
+                    boundApps.add(apps.toLowerCase());
+                }
+            }
+            
+            document.getElementById('slider-count').textContent = sliderCount;
+            document.getElementById('app-count').textContent = boundApps.size;
+            document.getElementById('active-count').textContent = activeApps.length;
+            document.getElementById('port-display').textContent = config.com_port || 'COM3';
+            document.getElementById('baud-display').textContent = config.baud_rate || 9600;
+            
+            document.getElementById('connection-status').className = 'status-indicator active';
+            document.getElementById('connection-text').textContent = 'Ready';
+            
+            await loadSliderVolumes();
+        }
+        
+        async function loadSliderVolumes() {
+            config = await eel.load_config()();
+            const mapping = config.slider_mapping || {};
+            const volumes = await eel.get_slider_volumes(mapping)();
+            
+            const container = document.getElementById('slider-volumes');
+            container.innerHTML = '';
+            
+            if (Object.keys(mapping).length === 0) {
+                container.innerHTML = '<p style="color: #888;">No sliders configured. Go to Slider Settings to add mappings.</p>';
+                return;
+            }
+            
+            const sortedSliders = Object.keys(mapping).sort((a, b) => a - b);
+            
+            sortedSliders.forEach(slider => {
+                const apps = mapping[slider];
+                const appList = Array.isArray(apps) ? apps : [apps];
+                const appNames = appList.join(', ');
+                
+                let avgVolume = 0;
+                let activeCount = 0;
+                appList.forEach(app => {
+                    if (volumes[app.toLowerCase()] !== undefined) {
+                        avgVolume += volumes[app.toLowerCase()];
+                        activeCount++;
+                    }
+                });
+                avgVolume = activeCount > 0 ? Math.round(avgVolume / activeCount) : 0;
+                
+                const div = document.createElement('div');
+                div.className = 'slider-volume';
+                div.innerHTML = `
+                    <div class="slider-volume-header">
+                        <span>Slider ${slider}</span>
+                        <span>${avgVolume}%</span>
+                    </div>
+                    <div class="volume-bar">
+                        <div class="volume-fill" style="width: ${avgVolume}%"></div>
+                    </div>
+                    <div class="slider-apps">${appNames}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        async function refreshApps() {
+            activeApps = await eel.get_active_apps()();
+            config = await eel.load_config()();
+            
+            const mapping = config.slider_mapping || {};
+            const boundSliders = {};
+            for (const [slider, apps] of Object.entries(mapping)) {
+                if (Array.isArray(apps)) {
+                    apps.forEach(app => boundSliders[app.toLowerCase()] = slider);
+                } else {
+                    boundSliders[apps.toLowerCase()] = slider;
+                }
+            }
+            
+            const appList = document.getElementById('app-list');
+            appList.innerHTML = '';
+            
+            const allApps = new Set([...activeApps, ...Object.keys(boundSliders)]);
+            const sortedApps = Array.from(allApps).sort();
+            
+            if (sortedApps.length === 0) {
+                appList.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">No applications found. Open some apps or add bindings in Slider Settings.</p>';
+                return;
+            }
+            
+            sortedApps.forEach(app => {
+                const isActive = activeApps.includes(app);
+                const isBound = boundSliders[app.toLowerCase()] !== undefined;
+                const sliderNum = boundSliders[app.toLowerCase()];
+                
+                const div = document.createElement('div');
+                div.className = 'app-item' + (isActive ? ' active' : '');
+                div.onclick = () => openSliderModal(app);
+                div.innerHTML = `
+                    <div>
+                        <div class="app-name">${app}</div>
+                        <div class="app-status">${isBound ? 'Bound to Slider ' + sliderNum : 'Not bound'}</div>
+                    </div>
+                    <div>${isActive ? '<span class="connected-badge">ACTIVE</span>' : '<span class="disconnected-badge">NOT RUNNING</span>'}</div>
+                `;
+                appList.appendChild(div);
+            });
+        }
+        
+        function openSliderModal(app) {
+            selectedApp = app;
+            document.getElementById('selected-app-name').textContent = app;
+            
+            const mapping = config.slider_mapping || {};
+            let currentSlider = null;
+            for (const [slider, apps] of Object.entries(mapping)) {
+                if (Array.isArray(apps) && apps.some(a => a.toLowerCase() === app.toLowerCase())) {
+                    currentSlider = slider;
+                    break;
+                } else if (typeof apps === 'string' && apps.toLowerCase() === app.toLowerCase()) {
+                    currentSlider = slider;
+                    break;
+                }
+            }
+            
+            const grid = document.getElementById('slider-grid');
+            grid.innerHTML = '';
+            
+            for (let i = 0; i < 6; i++) {
+                const btn = document.createElement('div');
+                btn.className = 'slider-btn' + (currentSlider == i ? ' selected' : '');
+                btn.textContent = i;
+                btn.onclick = () => selectSlider(i);
+                grid.appendChild(btn);
+            }
+            
+            document.getElementById('slider-modal').classList.add('show');
+        }
+        
+        function selectSlider(num) {
+            document.querySelectorAll('.slider-btn').forEach(b => b.classList.remove('selected'));
+            event.target.classList.add('selected');
+            window.selectedSlider = num;
+        }
+        
+        function closeModal() {
+            document.getElementById('slider-modal').classList.remove('show');
+            selectedApp = null;
+            window.selectedSlider = null;
+        }
+        
+        async function saveAppBinding() {
+            const slider = window.selectedSlider;
+            if (slider === null || slider === undefined) {
+                alert('Please select a slider');
+                return;
+            }
+            
+            let mapping = config.slider_mapping || {};
+            
+            for (const [s, apps] of Object.entries(mapping)) {
+                if (Array.isArray(apps)) {
+                    mapping[s] = apps.filter(a => a.toLowerCase() !== selectedApp.toLowerCase());
+                } else if (typeof apps === 'string' && apps.toLowerCase() === selectedApp.toLowerCase()) {
+                    delete mapping[s];
+                }
+            }
+            
+            if (!mapping[slider]) {
+                mapping[slider] = [];
+            }
+            if (Array.isArray(mapping[slider])) {
+                mapping[slider].push(selectedApp);
+            } else {
+                mapping[slider] = [mapping[slider], selectedApp];
+            }
+            
+            config.slider_mapping = mapping;
+            await eel.save_config(config)();
+            
+            closeModal();
+            refreshApps();
+        }
         
         async function load() {
             config = await eel.load_config()();
+            
             document.getElementById('com_port').value = config.com_port || 'COM3';
             document.getElementById('baud_rate').value = config.baud_rate || 9600;
             document.getElementById('jitter_threshold').value = config.jitter_threshold || 10;
@@ -139,7 +450,7 @@
             alert('Config saved!');
         }
         
-        load();
+init();
     </script>
 </body>
 </html>

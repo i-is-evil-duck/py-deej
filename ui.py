@@ -14,14 +14,16 @@ _server = None
 def load_config():
     if Path(CONFIG_FILE).exists():
         with open(CONFIG_FILE) as f:
-            return yaml.safe_load(f)
+            data = yaml.safe_load(f)
+            if data:
+                return data
     return {"slider_mapping": {}, "com_port": "COM3", "baud_rate": 9600}
 
 
 @eel.expose
 def save_config(config):
     with open(CONFIG_FILE, "w") as f:
-        yaml.safe_dump(config, f, default_flow_style=False, sort_mappings=False)
+        yaml.safe_dump(config, f, default_flow_style=False)
     return True
 
 
@@ -29,6 +31,37 @@ def save_config(config):
 def get_com_ports():
     import serial.tools.list_ports
     return [p.device for p in serial.tools.list_ports.comports()]
+
+
+@eel.expose
+def get_active_apps():
+    from deej import VolumeController
+    vc = VolumeController()
+    return vc.list_apps()
+
+
+@eel.expose
+def get_slider_volumes(slider_mapping):
+    from deej import VolumeController
+    vc = VolumeController()
+    volumes = {}
+    
+    for slider, apps in slider_mapping.items():
+        if isinstance(apps, str):
+            apps = [apps]
+        for app in apps:
+            vol = vc.get_volume(app)
+            if vol is not None:
+                volumes[app.lower()] = vol
+    return volumes
+
+
+@eel.expose
+def get_config():
+    if Path(CONFIG_FILE).exists():
+        with open(CONFIG_FILE) as f:
+            return yaml.safe_load(f)
+    return {"slider_mapping": {}, "com_port": "COM3", "baud_rate": 9600}
 
 
 def start(port=5000):
