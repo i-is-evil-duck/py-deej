@@ -146,7 +146,7 @@ class NoiseReducer:
 # Serial Reader
 # =========================================================
 class SerialReader:
-    def __init__(self, port, baud, sliders, debug=False):
+    def __init__(self, port, baud, sliders, debug=False, jitter_threshold=10):
         self.port = port
         self.baud = baud
         self.sliders = sliders
@@ -156,7 +156,7 @@ class SerialReader:
         self.running = False
         self.queue = Queue()
 
-        self.noise = NoiseReducer(sliders)
+        self.noise = NoiseReducer(sliders, threshold=jitter_threshold)
 
     def connect(self):
         try:
@@ -228,10 +228,11 @@ class DeejApp:
         mapping = cfg.get("slider_mapping", {})
         port = cfg.get("com_port", "COM3")
         baud = cfg.get("baud_rate", 9600)
+        jitter = cfg.get("jitter_threshold", 10)
 
         sliders = max(map(int, mapping.keys())) + 1
 
-        self.reader = SerialReader(port, baud, sliders, self.debug)
+        self.reader = SerialReader(port, baud, sliders, self.debug, jitter_threshold=jitter)
         self.last_percent = {}
 
         def handle(values):

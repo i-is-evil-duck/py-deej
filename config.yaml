@@ -7,6 +7,7 @@ slider_mapping:
     - discord.exe
   "4": master
 
+jitter_threshold: 10
 invert_sliders: false
 com_port: COM3
 baud_rate: 9600
