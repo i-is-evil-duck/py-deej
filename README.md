@@ -1,4 +1,4 @@
-pydej
+pydeej
 =====
 
 Hardware volume controller that maps Arduino slider positions to application and
@@ -23,6 +23,7 @@ Setup
 2. Edit ``config.yaml`` to match your setup:
 
 - ``slider_mapping``: Maps slider numbers (0-n) to application exe names or "master"
+- ``jitter_threshold``: Minimum slider movement before updating (default 10)
 - ``com_port``: Serial port (e.g., COM3 on Windows, /dev/ttyUSB0 on Linux)
 - ``baud_rate``: Baud rate (default 9600)
 - ``invert_sliders``: Set to true to invert slider values
