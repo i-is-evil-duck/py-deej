@@ -1,0 +1,12 @@
+slider_mapping:
+  "0": master
+  "1": brave.exe
+  "2": spotify.exe
+  "3":
+    - assetocorsa.exe
+    - discord.exe
+  "4": master
+
+invert_sliders: false
+com_port: COM3
+baud_rate: 9600
