@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Deej Config Editor</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+              background: #1a1a2e; color: #eee; padding: 20px; }
+        h1 { margin-bottom: 20px; color: #eee; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .section { background: #16213e; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .section h2 { margin-bottom: 15px; color: #ff6b6b; }
+        label { display: block; margin-bottom: 5px; }
+        input[type="text"], input[type="number"], select { width: 100%; padding: 10px; margin-bottom: 15px; border: none; border-radius: 4px; 
+                       background: #0f3460; color: #eee; }
+        input[type="checkbox"] { width: auto; margin-right: 10px; }
+        button { background: #e94560; color: white; border: none; padding: 12px 24px; border-radius: 4px; 
+                 cursor: pointer; font-size: 16px; margin-right: 10px; }
+        button:hover { background: #ff6b6b; }
+        button.secondary { background: #0f3460; }
+        .slider-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+        .slider-row input[type="number"], .slider-row input[type="text"] { margin-bottom: 0; }
+        .remove-btn { background: #e94560; padding: 10px; width: auto; }
+    </style>
+</head>
+    <meta charset="UTF-8">
+    <title>Deej Config Editor</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+              background: #1a1a2e; color: #eee; padding: 20px; }
+        h1 { margin-bottom: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .section { background: #16213e; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .section h2 { margin-bottom: 15px; color: #0f3460; }
+        label { display: block; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 10px; margin-bottom: 15px; border: none; border-radius: 4px; 
+                       background: #0f3460; color: #eee; }
+        button { background: #e94560; color: white; border: none; padding: 12px 24px; border-radius: 4px; 
+                 cursor: pointer; font-size: 16px; margin-right: 10px; }
+        button:hover { background: #ff6b6b; }
+        button.secondary { background: #0f3460; }
+        .slider-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+        .slider-row input { margin-bottom: 0; }
+        .remove-btn { background: #e94560; padding: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Deej Config Editor</h1>
+        
+        <div class="section">
+            <h2>Serial Settings</h2>
+            <label>COM Port</label>
+            <select id="com_port"></select>
+            <label>Baud Rate</label>
+            <input type="number" id="baud_rate" value="9600">
+        </div>
+        
+        <div class="section">
+            <h2>Slider Mapping</h2>
+            <div id="mappings"></div>
+            <button onclick="addMapping()">Add Slider</button>
+        </div>
+        
+        <div class="section">
+            <h2>Options</h2>
+            <label>Jitter Threshold</label>
+            <input type="number" id="jitter_threshold" value="10">
+            <label>
+                <input type="checkbox" id="invert_sliders"> Invert Sliders
+            </label>
+            <label>
+                <input type="checkbox" id="reconnect" checked> Auto Reconnect
+            </label>
+        </div>
+        
+        <button onclick="save()">Save Config</button>
+        <button class="secondary" onclick="load()">Reload</button>
+    </div>
+
+    <script src="/eel.js"></script>
+    <script>
+        let config = {};
+        
+        async function load() {
+            config = await eel.load_config()();
+            document.getElementById('com_port').value = config.com_port || 'COM3';
+            document.getElementById('baud_rate').value = config.baud_rate || 9600;
+            document.getElementById('jitter_threshold').value = config.jitter_threshold || 10;
+            document.getElementById('invert_sliders').checked = config.invert_sliders || false;
+            document.getElementById('reconnect').checked = config.reconnect !== false;
+            
+            const ports = await eel.get_com_ports()();
+            const portSelect = document.getElementById('com_port');
+            portSelect.innerHTML = ports.map(p => `<option value="${p}">${p}</option>`).join('');
+            portSelect.value = config.com_port || 'COM3';
+            
+            const mappings = document.getElementById('mappings');
+            mappings.innerHTML = '';
+            const mapping = config.slider_mapping || {};
+            for (const [slider, apps] of Object.entries(mapping)) {
+                addMapping(slider, Array.isArray(apps) ? apps.join(', ') : apps);
+            }
+        }
+        
+        function addMapping(sliderVal = '', appsVal = '') {
+            const div = document.createElement('div');
+            div.className = 'slider-row';
+            div.innerHTML = `
+                <input type="number" placeholder="Slider #" value="${sliderVal}" class="slider-num">
+                <input type="text" placeholder="App names (comma separated)" value="${appsVal}" class="app-names">
+                <button class="remove-btn" onclick="this.parentElement.remove()">X</button>
+            `;
+            document.getElementById('mappings').appendChild(div);
+        }
+        
+        async function save() {
+            const mapping = {};
+            document.querySelectorAll('#mappings .slider-row').forEach(row => {
+                const slider = row.querySelector('.slider-num').value;
+                const apps = row.querySelector('.app-names').value;
+                if (slider && apps) {
+                    mapping[slider] = apps.split(',').map(a => a.trim()).filter(a => a);
+                }
+            });
+            
+            config = {
+                slider_mapping: mapping,
+                com_port: document.getElementById('com_port').value,
+                baud_rate: parseInt(document.getElementById('baud_rate').value),
+                jitter_threshold: parseInt(document.getElementById('jitter_threshold').value),
+                invert_sliders: document.getElementById('invert_sliders').checked,
+                reconnect: document.getElementById('reconnect').checked
+            };
+            
+            await eel.save_config(config)();
+            alert('Config saved!');
+        }
+        
+        load();
+    </script>
+</body>
+</html>
