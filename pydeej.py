@@ -249,6 +249,7 @@ class DeejApp:
         self.debug = debug
         self.volume = VolumeController()
         self.reader = None
+        self.running = False
 
     def load(self):
         with open(self.config) as f:
@@ -293,20 +294,18 @@ class DeejApp:
                         self.volume.set(app, percent)
 
         if not self.reader.start():
-            print("Failed to start serial")
+            logger.error("Failed to start serial")
             return
 
-        print("Running... Ctrl+C to stop")
+        self.running = True
+        while self.running:
+            data = self.reader.get()
+            if data:
+                handle(data)
+            time.sleep(0.01)
 
-        try:
-            while True:
-                data = self.reader.get()
-                if data:
-                    handle(data)
-                time.sleep(0.01)
-
-        except KeyboardInterrupt:
-            print("Stopping...")
+        if self.reader:
+            self.reader.running = False
 
 
 # =========================================================
@@ -335,15 +334,22 @@ def main():
     parser.add_argument("--config", default="config.yaml")
     parser.add_argument("--applist", action="store_true")
     parser.add_argument("--portlist", action="store_true")
+    parser.add_argument("--no-tray", action="store_true", help="Disable system tray")
+    parser.add_argument("--verbose", action="store_true", help="Show log messages")
     args = parser.parse_args()
+
+    if args.debug or args.verbose:
+        logging.basicConfig(level=logging.INFO)
+    else:
+        logging.basicConfig(level=logging.WARNING)
 
     config_path = get_config_path(args.config)
     app = DeejApp(config_path, args.debug)
 
     # ---------------- App list mode ----------------
     if args.applist:
-        vc = VolumeController()
         print("\nActive apps:\n")
+        vc = VolumeController()
         for a in vc.list_apps():
             print(" -", a)
         return
@@ -355,6 +361,13 @@ def main():
         for port in serial.tools.list_ports.comports():
             print(f" - {port.device}  ({port.description})")
         return
+
+    # ---------------- System tray ----------------
+    if not args.no_tray:
+        import tray
+        def on_quit():
+            app.running = False
+        tray.start(on_quit=on_quit)
 
     app.run()
 

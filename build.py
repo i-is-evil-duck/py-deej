@@ -21,7 +21,7 @@ args = [
     str(spec_dir / "pydeej.py"),
     f"--name={app_name}",
     "--onefile",
-    "--console",
+    "--noconsole",
     f"--add-data={config_data}",
     f"--distpath={spec_dir}/dist",
     f"--workpath={spec_dir}/build",
