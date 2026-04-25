@@ -307,11 +307,14 @@ class DeejApp:
 # =========================================================
 def get_config_path(default):
     p = Path(default)
-    if getattr(sys, 'frozen', False):
-        bundle_dir = Path(sys._MEIPASS)
-        bundled = bundle_dir / p.name
-        if bundled.exists():
-            return str(bundled)
+    if not p.is_absolute():
+        if p.exists():
+            return default
+        if getattr(sys, 'frozen', False):
+            bundle_dir = Path(sys._MEIPASS)
+            bundled = bundle_dir / p.name
+            if bundled.exists():
+                return str(bundled)
     return default
 
 def main():
