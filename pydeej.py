@@ -312,9 +312,14 @@ def get_config_path(default):
         bundle_dir = Path(sys._MEIPASS)
         bundled = bundle_dir / p.name
         local = exe_dir / p.name
+        print(f"[DEBUG] exe_dir: {exe_dir}")
+        print(f"[DEBUG] bundle_dir: {bundle_dir}")
+        print(f"[DEBUG] bundled config exists: {bundled.exists()}")
+        print(f"[DEBUG] local config exists: {local.exists()}")
         if local.exists():
             return str(local)
         if bundled.exists():
+            print(f"[DEBUG] Copying bundled config to {local}")
             local.write_bytes(bundled.read_bytes())
             return str(local)
     elif not p.is_absolute():
