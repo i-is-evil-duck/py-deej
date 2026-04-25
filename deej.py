@@ -328,6 +328,15 @@ class DeejApp:
 # =========================================================
 # Main
 # =========================================================
+def get_config_path(default):
+    p = Path(default)
+    if getattr(sys, 'frozen', False):
+        bundle_dir = Path(sys._MEIPASS)
+        bundled = bundle_dir / p.name
+        if bundled.exists():
+            return str(bundled)
+    return default
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--debug", action="store_true")
@@ -335,7 +344,8 @@ def main():
     parser.add_argument("--applist", action="store_true")
     args = parser.parse_args()
 
-    app = DeejApp(args.config, args.debug)
+    config_path = get_config_path(args.config)
+    app = DeejApp(config_path, args.debug)
 
     # ---------------- App list mode ----------------
     if args.applist:
