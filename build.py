@@ -31,7 +31,7 @@ args = [
 if system == "Windows":
     args.append("--hidden-import=comtypes")
     args.append("--exclude-module=pulsectl")
-elif system == "Linux":
+elif system in ("Linux", "Darwin"):
     args.append("--exclude-module=pycaw")
     args.append("--exclude-module=comtypes")
 
