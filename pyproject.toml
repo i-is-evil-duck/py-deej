@@ -1,0 +1,25 @@
+[project]
+name = "pydeej"
+version = "1.0.0"
+description = "Hardware volume controller for Arduino sliders"
+requires-python = ">=3.10"
+dependencies = [
+    "pyserial",
+    "pyyaml",
+    "pystray",
+    "Pillow",
+]
+
+[project.optional-dependencies]
+windows = ["pycaw", "comtypes"]
+linux = ["pulsectl"]
+
+[project.scripts]
+pydeej = "pydeej:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = []
