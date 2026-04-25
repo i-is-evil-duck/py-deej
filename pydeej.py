@@ -294,10 +294,8 @@ class DeejApp:
                         self.volume.set(app, percent)
 
         if not self.reader.start():
-            print("Failed to start serial")
+            logger.error("Failed to start serial")
             return
-
-        print("Running... Right-click tray icon to quit")
 
         self.running = True
         while self.running:
@@ -308,7 +306,6 @@ class DeejApp:
 
         if self.reader:
             self.reader.running = False
-        print("Stopped.")
 
 
 # =========================================================
@@ -338,15 +335,21 @@ def main():
     parser.add_argument("--applist", action="store_true")
     parser.add_argument("--portlist", action="store_true")
     parser.add_argument("--no-tray", action="store_true", help="Disable system tray")
+    parser.add_argument("--verbose", action="store_true", help="Show log messages")
     args = parser.parse_args()
+
+    if args.debug or args.verbose:
+        logging.basicConfig(level=logging.INFO)
+    else:
+        logging.basicConfig(level=logging.WARNING)
 
     config_path = get_config_path(args.config)
     app = DeejApp(config_path, args.debug)
 
     # ---------------- App list mode ----------------
     if args.applist:
-        vc = VolumeController()
         print("\nActive apps:\n")
+        vc = VolumeController()
         for a in vc.list_apps():
             print(" -", a)
         return
