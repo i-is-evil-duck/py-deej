@@ -249,6 +249,7 @@ class DeejApp:
         self.debug = debug
         self.volume = VolumeController()
         self.reader = None
+        self.running = False
 
     def load(self):
         with open(self.config) as f:
@@ -296,17 +297,18 @@ class DeejApp:
             print("Failed to start serial")
             return
 
-        print("Running... Ctrl+C to stop")
+        print("Running... Right-click tray icon to quit")
 
-        try:
-            while True:
-                data = self.reader.get()
-                if data:
-                    handle(data)
-                time.sleep(0.01)
+        self.running = True
+        while self.running:
+            data = self.reader.get()
+            if data:
+                handle(data)
+            time.sleep(0.01)
 
-        except KeyboardInterrupt:
-            print("Stopping...")
+        if self.reader:
+            self.reader.running = False
+        print("Stopped.")
 
 
 # =========================================================
@@ -335,6 +337,7 @@ def main():
     parser.add_argument("--config", default="config.yaml")
     parser.add_argument("--applist", action="store_true")
     parser.add_argument("--portlist", action="store_true")
+    parser.add_argument("--no-tray", action="store_true", help="Disable system tray")
     args = parser.parse_args()
 
     config_path = get_config_path(args.config)
@@ -355,6 +358,13 @@ def main():
         for port in serial.tools.list_ports.comports():
             print(f" - {port.device}  ({port.description})")
         return
+
+    # ---------------- System tray ----------------
+    if not args.no_tray:
+        import tray
+        def on_quit():
+            app.running = False
+        tray.start(on_quit=on_quit)
 
     app.run()
 
