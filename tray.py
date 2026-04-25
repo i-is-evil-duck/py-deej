@@ -45,7 +45,7 @@ def start(on_quit=None):
 
     _on_quit = on_quit
 
-    menu = Item('Quit', _quit_handler)
+    menu = (Item('Quit', _quit_handler),)
     _icon = pystray.Icon("pydeej", _create_icon_image(), "PyDeej", menu)
 
     def run():
