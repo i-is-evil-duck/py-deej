@@ -314,7 +314,8 @@ def get_config_path(default):
             bundle_dir = Path(sys._MEIPASS)
             bundled = bundle_dir / p.name
             if bundled.exists():
-                return str(bundled)
+                p.write_bytes(bundled.read_bytes())
+                return default
     return default
 
 def main():
