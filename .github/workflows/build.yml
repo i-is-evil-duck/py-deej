@@ -40,7 +40,8 @@ jobs:
 
       - name: Zip macOS artifact
         if: matrix.os == 'macos-latest'
-        run: cd dist && zip -r deej.zip deej.app
+        working-directory: dist
+        run: zip -r deej.zip deej.app
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
