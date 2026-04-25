@@ -19,14 +19,6 @@ try:
 except ImportError:
     WINDOWS = False
 
-
-def _init_com():
-    if WINDOWS:
-        try:
-            comtypes.CoInitialize()
-        except Exception:
-            pass
-
 # ---------------- Linux ----------------
 try:
     import pulsectl
@@ -36,7 +28,7 @@ except ImportError:
 
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("pydeej")
+logger = logging.getLogger("deej")
 
 
 # =========================================================
@@ -52,12 +44,6 @@ class VolumeController:
                 self.pulse = pulsectl.Pulse("deej")
             except:
                 self.pulse = None
-
-        if WINDOWS:
-            try:
-                comtypes.CoInitialize()
-            except Exception:
-                pass
 
     # ---------------- Windows ----------------
     def refresh_windows(self):
@@ -251,19 +237,12 @@ class SerialReader:
 # App
 # =========================================================
 class DeejApp:
-    _instance = None
-    
     def __init__(self, config, debug=False):
         self.config = Path(config)
         self.debug = debug
         self.volume = VolumeController()
         self.reader = None
-        DeejApp._instance = self
 
-    @classmethod
-    def get_instance(cls):
-        return cls._instance
-    
     def load(self):
         with open(self.config) as f:
             return yaml.safe_load(f)
@@ -283,7 +262,6 @@ class DeejApp:
         self.reader = SerialReader(port, baud, sliders, self.debug, jitter_threshold=jitter, reconnect=reconnect)
         self.last_percent = {}
         self.invert = invert
-        self.current_volumes = {}
 
         def handle(values):
             if self.invert:
@@ -297,7 +275,6 @@ class DeejApp:
 
                 percent = int((v / 1023) * 100)
                 apps = mapping[key]
-                self.current_volumes[key] = {"percent": percent, "apps": apps}
 
                 if key not in self.last_percent or self.last_percent[key] != percent:
                     self.last_percent[key] = percent
