@@ -1,6 +1,5 @@
 import PyInstaller.__main__
 import platform
-import shutil
 from pathlib import Path
 
 spec_dir = Path(__file__).parent
@@ -40,6 +39,3 @@ args = [
 ]
 
 PyInstaller.__main__.run(args)
-
-if system == "Darwin":
-    shutil.move(spec_dir / "dist" / "deej", spec_dir / "dist" / "deej.app")
