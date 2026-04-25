@@ -53,7 +53,7 @@ def start(on_open_ui=None, on_quit=None):
     _on_quit = on_quit
     
     menu = Item('Open Config', _open_handler), Item('Quit', _quit_handler)
-    _icon = pystray.Icon("deej", _create_icon_image(), "Deej", menu)
+    _icon = pystray.Icon("pydeej", _create_icon_image(), "PyDeej", menu)
     
     def run():
         _icon.run()

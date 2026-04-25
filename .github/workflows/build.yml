@@ -16,11 +16,11 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            artifact: deej.exe
+            artifact: pydeej.exe
           - os: ubuntu-latest
-            artifact: deej
+            artifact: pydeej
           - os: macos-latest
-            artifact: deej
+            artifact: pydeej
 
     steps:
       - uses: actions/checkout@v4
@@ -43,7 +43,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: deej-${{ matrix.os }}
+          name: pydeej-${{ matrix.os }}
           path: dist/${{ matrix.artifact }}
 
       - name: Create Release

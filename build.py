@@ -7,24 +7,24 @@ spec_dir = Path(__file__).parent
 system = platform.system()
 if system == "Windows":
     ext = ".exe"
-    app_name = "deej.exe"
+    app_name = "pydeej.exe"
     data_flag = "--add-data"
     data_sep = ";"
 elif system == "Darwin":
     ext = ".app"
-    app_name = "deej"
+    app_name = "pydeej"
     data_flag = "--add-data"
     data_sep = ":"
 else:
     ext = ""
-    app_name = "deej"
+    app_name = "pydeej"
     data_flag = "--add-data"
     data_sep = ":"
 
 config_data = f"{spec_dir / 'config.yaml'}{data_sep}."
 
 args = [
-    str(spec_dir / "deej.py"),
+    str(spec_dir / "pydeej.py"),
     f"--name={app_name}",
     "--onefile",
     "--console",

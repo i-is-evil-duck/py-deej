@@ -5,7 +5,7 @@ import argparse
 import threading
 import time
 
-import deej
+import pydeej
 import ui
 import tray
 
@@ -17,7 +17,7 @@ _running = True
 
 def _run_volume_control(config_path, debug):
     global _deej_app
-    _deej_app = deej.DeejApp(config_path, debug)
+    _deej_app = pydeej.DeejApp(config_path, debug)
     _deej_app.run()
 
 

@@ -34,7 +34,7 @@ def get_com_ports():
 
 @eel.expose
 def get_active_apps():
-    from deej import VolumeController
+    from pydeej import VolumeController
     vc = VolumeController()
     return vc.list_apps()
 
@@ -55,7 +55,7 @@ def load_app_list():
 def get_volume_state():
     app = None
     try:
-        from deej import DeejApp
+        from pydeej import DeejApp
         app = DeejApp.get_instance()
     except Exception:
         pass

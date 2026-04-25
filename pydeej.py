@@ -36,7 +36,7 @@ except ImportError:
 
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("deej")
+logger = logging.getLogger("pydeej")
 
 
 # =========================================================
