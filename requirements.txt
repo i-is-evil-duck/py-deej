@@ -1,0 +1,7 @@
+pyserial
+pyyaml
+pycaw
+comtypes
+pulsectl
+pystray
+Pillow
