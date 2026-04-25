@@ -307,15 +307,19 @@ class DeejApp:
 # =========================================================
 def get_config_path(default):
     p = Path(default)
-    if not p.is_absolute():
+    if getattr(sys, 'frozen', False):
+        exe_dir = Path(sys.executable).parent
+        bundle_dir = Path(sys._MEIPASS)
+        bundled = bundle_dir / p.name
+        local = exe_dir / p.name
+        if local.exists():
+            return str(local)
+        if bundled.exists():
+            local.write_bytes(bundled.read_bytes())
+            return str(local)
+    elif not p.is_absolute():
         if p.exists():
             return default
-        if getattr(sys, 'frozen', False):
-            bundle_dir = Path(sys._MEIPASS)
-            bundled = bundle_dir / p.name
-            if bundled.exists():
-                p.write_bytes(bundled.read_bytes())
-                return default
     return default
 
 def main():
