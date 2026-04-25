@@ -334,6 +334,7 @@ def main():
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--config", default="config.yaml")
     parser.add_argument("--applist", action="store_true")
+    parser.add_argument("--portlist", action="store_true")
     args = parser.parse_args()
 
     config_path = get_config_path(args.config)
@@ -345,6 +346,14 @@ def main():
         print("\nActive apps:\n")
         for a in vc.list_apps():
             print(" -", a)
+        return
+
+    # ---------------- Port list mode ----------------
+    if args.portlist:
+        import serial.tools.list_ports
+        print("\nAvailable serial ports:\n")
+        for port in serial.tools.list_ports.comports():
+            print(f" - {port.device}  ({port.description})")
         return
 
     app.run()
