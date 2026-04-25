@@ -10,25 +10,32 @@ from pathlib import Path
 from collections import deque
 from queue import Queue
 import logging
+import platform
 
 # ---------------- Windows ----------------
-try:
-    from pycaw.pycaw import AudioUtilities, ISimpleAudioVolume, IAudioEndpointVolume
-    import comtypes
-    WINDOWS = True
-except ImportError:
+if platform.system() == "Windows":
+    try:
+        from pycaw.pycaw import AudioUtilities, ISimpleAudioVolume, IAudioEndpointVolume
+        import comtypes
+        WINDOWS = True
+    except ImportError:
+        WINDOWS = False
+else:
     WINDOWS = False
 
 # ---------------- Linux ----------------
-try:
-    import pulsectl
-    LINUX = True
-except ImportError:
+if platform.system() == "Linux":
+    try:
+        import pulsectl
+        LINUX = True
+    except Exception:
+        LINUX = False
+else:
     LINUX = False
 
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("deej")
+logger = logging.getLogger("pydeej")
 
 
 # =========================================================
@@ -312,14 +319,9 @@ def get_config_path(default):
         bundle_dir = Path(sys._MEIPASS)
         bundled = bundle_dir / p.name
         local = exe_dir / p.name
-        print(f"[DEBUG] exe_dir: {exe_dir}")
-        print(f"[DEBUG] bundle_dir: {bundle_dir}")
-        print(f"[DEBUG] bundled config exists: {bundled.exists()}")
-        print(f"[DEBUG] local config exists: {local.exists()}")
         if local.exists():
             return str(local)
         if bundled.exists():
-            print(f"[DEBUG] Copying bundled config to {local}")
             local.write_bytes(bundled.read_bytes())
             return str(local)
     elif not p.is_absolute():
