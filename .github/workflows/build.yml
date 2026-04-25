@@ -18,7 +18,7 @@ jobs:
           - os: ubuntu-latest
             artifact: deej
           - os: macos-latest
-            artifact: deej.app
+            artifact: deej
 
     steps:
       - uses: actions/checkout@v4
@@ -38,21 +38,16 @@ jobs:
         env:
           PYTHONIOENCODING: utf-8
 
-      - name: Zip macOS artifact
-        if: matrix.os == 'macos-latest'
-        working-directory: dist
-        run: zip -r deej.zip deej.app
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: deej-${{ matrix.os }}
-          path: ${{ matrix.os == 'macos-latest' && 'dist/deej.zip' || 'dist/${{ matrix.artifact }}' }}
+          path: dist/${{ matrix.artifact }}
 
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ matrix.os == 'macos-latest' && 'dist/deej.zip' || 'dist/${{ matrix.artifact }}' }}
+          files: dist/${{ matrix.artifact }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
